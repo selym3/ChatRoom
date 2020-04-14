@@ -34,14 +34,10 @@ public class ClientManager {
 		m.start();
 	}
 
-	public void remove(Client c) {
-		for (ManagerThread thread : threads) {
-			if (thread.getClient() == c) {
-				thread.interrupt();
-			}
-			threads.remove(thread);
-			thread = null;
-		}
+	public void remove(Client c, Thread thread) {
+		threads.remove(thread);
+		thread.interrupt();
+		thread = null;
 
 		clients.remove(c);
 		c.stop();
@@ -82,8 +78,15 @@ public class ClientManager {
 	 */
 	public void stop() {
 		for (Client c : clients) {
-			remove(c);
+			clients.remove(c);
+			c.stop();
 			c = null;
+		}
+
+		for (Thread t : threads) {
+			threads.remove(t);
+			t.interrupt();
+			t = null;
 		}
 	}
 

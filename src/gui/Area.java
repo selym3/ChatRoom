@@ -2,7 +2,6 @@ package gui;
 
 import java.awt.Dimension;
 
-import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -15,7 +14,6 @@ public class Area extends JScrollPane {
 		public Text(int screenWidth, double width, int height) {
 	    
 			setMaximumSize(new Dimension((int) (screenWidth * width), height));
-//			setPreferredSize(new Dimension((int) (screenWidth * width), height));
 			
 			setLineWrap(true);
 	        setWrapStyleWord(true);
@@ -34,17 +32,13 @@ public class Area extends JScrollPane {
 	private final int sWidth;
 
 	public Area(int screenWidth, double width, int height) {
+	
 		super(new Text(screenWidth, width, height));
 		area = (Text) (getViewport().getComponents()[0]);
 		
 		this.sWidth = screenWidth;
 		this.width = width;
 		
-		//setSize(10,10);
-		//setPreferredSze(new Dimension((int) (screenWidth * width), height));
-		//setMaximumSize(new Dimension((int) (300), 300));
-		
-	
 	}
 
 	public double getRelativeWidth() {

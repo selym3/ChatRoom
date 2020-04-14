@@ -8,23 +8,18 @@ import java.util.Scanner;
 
 public class Server {
 
-	public static void main(String[] args) {
-		Server s = new Server();
-		s.start();
-	}
-	
 	private final int port;
 	
 	private ServerSocket server;
 	
 	private boolean open;
-	private Thread acceptorThread;
-	private Thread consoleThread;
+	private Thread acceptorThread; // waits for someone to join
+	private Thread consoleThread; // waits for typed text in the console
 	
 	private ClientManager handler;
 	
 	/**
-	 * Defines where data sent to the server is destined for.
+	 * System.out because the server is always going to be console.
 	 */
 	private PrintStream out;
 	
@@ -72,6 +67,11 @@ public class Server {
 		}, "Console-Thread");
 	}
 	
+	/**
+	 * Present a message to the server.
+	 * 
+	 * @param message message
+	 */
 	public void write(String message) {
 		out.println(message);
 	}

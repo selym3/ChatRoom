@@ -26,10 +26,6 @@ public class ManagerThread extends Thread {
 			setName("Manager-Thread-" + cm.getUsers());
 		}
 		
-		protected Client getClient() {
-			return client;
-		}
-		
 		@Override
 		public void run() {
 			while (server.isOpen() && client.isOpen()) {
@@ -58,7 +54,7 @@ public class ManagerThread extends Thread {
 				} catch (IOException e) {
 					break; // if it breaks, it was likely closed
 				}
-				handler.remove(client);
+				handler.remove(client, this);
 			}
 		}
 }

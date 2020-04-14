@@ -4,20 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ConnectException;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class User {
-
-//	public static void main(String[] args) {
-//		User n = new User("muhahahah123");
-//		try {
-//			n.start();
-//		} catch (IOException e) {
-//			System.out.println("No connection");
-//		}
-//	}
 
 	private Socket endpoint;
 	private PrintWriter writer; // to server
@@ -28,8 +17,10 @@ public class User {
 	private String host;
 	private int port;
 
-//	private Thread consoleThread; // listen for console input
-	private Thread readingThread; // read from the server
+	// data is emitted externally, but a consoleThread can be created
+	// and lines from the console can be emitted using Scanner class
+	// (the when reading from System.in u cannot interrupt thread normally)
+	private Thread readingThread; // handle data from the server
 
 	private String username; // sent to the server on creation
 
@@ -47,40 +38,24 @@ public class User {
 	public User(String username, String host, int port) {
 		open = false;
 
+		gui = null;
+
 		this.username = username;
 		this.host = host;
 		this.port = port;
 
-//		consoleThread = new Thread(() -> {
-//			while (open) {
-//				Scanner sc = new Scanner(System.in);
-//				String l;
-//				while ((l = sc.nextLine()) != null) {
-//					if (!open) break;
-//					emit(l);
-//					if (l.equals(Config.EXIT)) {
-//						break;
-//					}
-//				}
-//				sc.close();
-//				stop();
-//			}
-//		}, "Console-Thread");
-
+		// handles input coming broadcasted from the server
 		readingThread = new Thread(() -> {
 			while (open) {
 				String l;
 				try {
 					while ((l = reader.readLine()) != null) {
-						System.out.println(l);
 						if (gui != null) {
 							gui.push(l);
+						} else {
+							System.out.println(l);
 						}
 						if (l.equals("[SERVER] " + Config.EXIT)) {
-							System.out.println("Server disconnected. Enter anything to leave...");
-							if (gui != null) {
-								//gui.push();
-							}
 							break;
 						}
 					}
@@ -123,14 +98,18 @@ public class User {
 
 			endpoint = new Socket(host, port);
 			writer = new PrintWriter(endpoint.getOutputStream(), true);
+			
+			// SEND THE USERNAME FIRST SO THE SERVER CAN HANDLE APPROPIATELY
 			emit(username);
+			
 			if (gui != null) {
 				gui.push("Joined server on port " + port + " as [" + username + "].");
+			} else {
+				System.out.println("Joined server on port " + port + " as [" + username + "].");
 			}
-			System.out.println("Joined server on port " + port + " as [" + username + "].");
+
 			reader = new BufferedReader(new InputStreamReader(endpoint.getInputStream()));
 
-//			consoleThread.start();
 			readingThread.start();
 		}
 	}
@@ -150,10 +129,6 @@ public class User {
 				e.printStackTrace();
 			}
 
-//			if (consoleThread != null) {
-//				consoleThread.interrupt();
-//			}
-//			consoleThread = null;
 			if (readingThread != null) {
 				readingThread.interrupt();
 			}
